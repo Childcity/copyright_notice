@@ -1,0 +1,11 @@
+{
+  "author_aliases": {
+    "bill.gates": "Bill Gates",
+    "Amazone\\jeff.bezos": "Jeff Bezos",
+    "Zuckerberg Mark": "Mark Zuckerberg"
+  },
+  "copyright_field_template": "(c) %CURRENT_YEAR%, Inc. All Rights Reserved.",
+  "ExcludedPathSections": [
+    "3rdparty"
+  ]
+}
