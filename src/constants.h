@@ -7,16 +7,16 @@ namespace appconst {
 
 extern const QLatin1String cAppDescription;
 extern const QLatin1String cStaticConfig;
-extern const std::array<const QLatin1String, 3> cExcludedPathSections;
 constexpr auto cPossibleBrokenCommitsNumber = 1000;
 constexpr auto cStartProcessTimeout = 5000;
 constexpr auto cProcessExecutionTimeout = 10000;
 
-extern const QLatin1String cCopyrightTemplate;
 extern const QLatin1String cEtAl;
 
 namespace json {
 extern const QLatin1String cAuthorAliases;
+extern const QLatin1String cCopyrightFieldTemplate;
+extern const QLatin1String cExcludedPathSections;
 }
 
 }  // namespace appconst

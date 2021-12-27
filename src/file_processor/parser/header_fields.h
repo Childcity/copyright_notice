@@ -53,10 +53,10 @@ inline QString toFieldName(FieldType fieldType)
 }
 // clang-format on
 
-inline QString makeCopyrightValue()
+inline QString makeCopyrightValue(QString copyrightTemplate)
 {
-	static const auto year = impl::currentYear();
-	return QString(appconst::cCopyrightTemplate).arg(year);
+	const auto year = impl::currentYear();
+	return copyrightTemplate.replace(QLatin1String("%CURRENT_YEAR%"), QString::number(year));
 }
 
 constexpr bool isListField(FieldType field)

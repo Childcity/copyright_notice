@@ -24,6 +24,12 @@ void onTermination(int)
 	gThreadPool.clear();
 }
 
+const StaticConfig &getStaticConfig(const RunConfig &config)
+{
+	const auto &path = config.staticConfigPath();
+	return RunConfig::getStaticConfig(path);
+}
+
 constexpr bool isExtensionExcluded(const QString &path)
 {
 	using namespace appconst;
@@ -34,10 +40,10 @@ constexpr bool isExtensionExcluded(const QString &path)
 	                    });
 }
 
-constexpr bool isPathExcluded(const QString &path)
+bool isPathExcluded(const QString &path, const ExcludedPathSections &excluded)
 {
 	using namespace appconst;
-	return std::any_of(cExcludedPathSections.cbegin(), cExcludedPathSections.cend(),
+	return std::any_of(excluded.cbegin(), excluded.cend(),
 	                   [&path](const auto &p) { return path.contains(p); })
 	    || isExtensionExcluded(path);
 }
@@ -120,9 +126,10 @@ void FileProcessor::process()
 void FileProcessor::process(const QString &targetPath)
 {
 	const QFileInfo target(targetPath);
+	const auto &staticConfig = getStaticConfig(m_config);
 
 	if (target.isFile()) {
-		if (isPathExcluded(targetPath)) {
+		if (isPathExcluded(targetPath, staticConfig.excludedPathSections())) {
 			CN_DEBUG("Skip excluded file" << targetPath);
 			return;
 		}
@@ -139,7 +146,7 @@ void FileProcessor::process(const QString &targetPath)
 	while (it.hasNext()) {
 		auto filePath = it.next();
 
-		if (isPathExcluded(filePath)) {
+		if (isPathExcluded(filePath, staticConfig.excludedPathSections())) {
 			CN_DEBUG("Skip excluded file or dir" << filePath);
 			continue;
 		}

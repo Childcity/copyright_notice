@@ -3,6 +3,7 @@
 #include <mutex>
 #include <QCommandLineParser>
 #include <QDir>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
@@ -187,25 +188,43 @@ StaticConfig getStaticConfig(const QString &path)
 	}
 
 	const auto aliasesVal = root.value(cAuthorAliases);
-	if (!root.contains(cAuthorAliases) || !aliasesVal.isObject()
-	    || aliasesVal.toObject().isEmpty()) {
-		handleError(QString("field '%1' not found").arg(cAuthorAliases));
+	if (!root.contains(cAuthorAliases) || !aliasesVal.isObject()) {
+		handleError(QString("map '%1' not found").arg(cAuthorAliases));
 		return {};
 	}
 
+	AuthorAliasesMap authorAliases;
 	const auto aliasesVariantHash = aliasesVal.toObject().toVariantHash();
-	if (aliasesVariantHash.isEmpty()) {
-		CN_WARN(Msg::BadStaticConfigFormat, QString("field '%1' is empty").arg(cAuthorAliases));
-		return {};
-	}
-
-	StaticConfig staticConfig{};
 	std::for_each(aliasesVariantHash.constKeyValueBegin(), aliasesVariantHash.constKeyValueEnd(),
-	              [&staticConfig](const auto &keyValue) {
-		              staticConfig.authorAliases[keyValue.first] = keyValue.second.toString();
+	              [&authorAliases](const auto &keyValue) {
+		              authorAliases[keyValue.first] = keyValue.second.toString();
 	              });
 
-	return staticConfig;
+	const auto copyrightFieldTemplateVal = root.value(cCopyrightFieldTemplate);
+	if (!root.contains(cCopyrightFieldTemplate) || !copyrightFieldTemplateVal.isString()) {
+		handleError(QString("string '%1' not found").arg(cCopyrightFieldTemplate));
+		return {};
+	}
+
+	const auto excludedPathSectionsVal = root.value(cExcludedPathSections);
+	if (!root.contains(cExcludedPathSections) || !excludedPathSectionsVal.isArray()) {
+		handleError(QString("array '%1' not found").arg(cExcludedPathSections));
+		return {};
+	}
+
+	ExcludedPathSections excludedPathSections;
+	const auto excludedPathSectionsArr = excludedPathSectionsVal.toArray();
+	std::transform(excludedPathSectionsArr.cbegin(), excludedPathSectionsArr.cend(),
+	               std::back_inserter(excludedPathSections),
+	               [](const auto &value) { return value.toString(); });
+
+	// clang-format off
+	return {
+	    std::move(authorAliases),
+	    copyrightFieldTemplateVal.toString(),
+	    std::move(excludedPathSections)
+	};
+	// clang-format on
 }
 
 static std::unique_ptr<StaticConfig> gStaticConfigInstance;

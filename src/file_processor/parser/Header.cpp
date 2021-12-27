@@ -37,6 +37,12 @@ int maxAlignedFieldNameLength(const HeaderFieldsVec &fields)
 	return max;
 }
 
+const StaticConfig &getStaticConfig(const auto &ctx)
+{
+	const auto &path = ctx.config.staticConfigPath();
+	return RunConfig::getStaticConfig(path);
+}
+
 }  // namespace
 
 Header::Header(const Context &ctx, const QByteArray &content, GitRepository repo) noexcept
@@ -80,7 +86,8 @@ bool Header::fix()
 	}
 
 	if (m_ctx.config.options() & RunOption::UpdateCopyright) {
-		static const auto copyrightValue = header_fields::makeCopyrightValue();
+		const auto &copyrightTemplate = getStaticConfig(m_ctx).copyrightFieldTemplate();
+		static const auto copyrightValue = header_fields::makeCopyrightValue(copyrightTemplate);
 		hasChanges |= fixField(HeaderFieldType::Copyright, copyrightValue);
 	}
 
@@ -282,9 +289,8 @@ std::vector<QString> Header::getAuthors()
 {
 	namespace hlp = header_helpers;
 	const bool verbose = m_ctx.config.options() & RunOption::Verbose;
-	const auto &path = m_ctx.config.staticConfigPath();
 
-	const auto &authorAliases = RunConfig::getStaticConfig(path).authorAliases;
+	const auto &authorAliases = getStaticConfig(m_ctx).authorAliases();
 	const auto &brokenCommits = hlp::getBrokenCommits(m_repo, verbose);
 
 	const auto headerLineRange = m_headerRangeOpt.has_value()
