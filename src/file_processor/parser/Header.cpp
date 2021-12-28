@@ -288,10 +288,14 @@ bool Header::mayUpdateAuthors() const
 std::vector<QString> Header::getAuthors()
 {
 	namespace hlp = header_helpers;
+	static const auto emptySet = std::set<QString>();
+
 	const bool verbose = m_ctx.config.options() & RunOption::Verbose;
+	const bool skipBrokenCommit = !m_ctx.config.options().testFlag(RunOption::DontSkipBrokenMerges);
 
 	const auto &authorAliases = getStaticConfig(m_ctx).authorAliases();
-	const auto &brokenCommits = hlp::getBrokenCommits(m_repo, verbose);
+	const auto &brokenCommits =
+	    skipBrokenCommit ? hlp::getBrokenCommits(m_repo, verbose) : emptySet;
 
 	const auto headerLineRange = m_headerRangeOpt.has_value()
 	    ? hlp::headerLineRange(m_content.data(), m_headerRangeOpt.value())
