@@ -21,7 +21,7 @@ void init()
 bool copyrightUpdateNotAllowed()
 {
 	static constexpr const char *falseValues[]{"False", "false", "F", "f", "0"};
-	const auto enabled = qgetenv("LINT_ENABLE_COPYRIGHT_AUTHOR_UPDATE");
+	const auto enabled = qgetenv("LINT_ENABLE_COPYRIGHT_UPDATE");
 	return std::any_of(std::cbegin(falseValues), std::cend(falseValues),
 	                   [&enabled](const auto &fv) { return enabled == fv; });
 }
@@ -107,7 +107,7 @@ RunConfig::RunConfig(const QStringList &arguments) noexcept
 		m_runOptions |= RunOption::UpdateFileName;
 	}
 
-	if (parser.isSet(updateAuthors) && qgetenv("LINT_ENABLE_COPYRIGHT_AUTHOR_UPDATE") == "") {
+	if (parser.isSet(updateAuthors) && qgetenv("LINT_ENABLE_COPYRIGHT_UPDATE") == "") {
 		m_runOptions |= RunOption::UpdateAuthors;
 	}
 

@@ -81,13 +81,13 @@ void RunConfigTest::test_ReadOnlyMode()
 	// clang-format on
 
 	for (auto &v : {"False", "false", "F", "f", "0"}) {
-		qputenv("LINT_ENABLE_COPYRIGHT_AUTHOR_UPDATE", v);
+		qputenv("LINT_ENABLE_COPYRIGHT_UPDATE", v);
 		const RunConfig runConfig(args);
 		QVERIFY2(runConfig.options() & RunOption::ReadOnlyMode,
 		         qPrintable(QString("Failed with tested value '%1'").arg(v)));
 	}
 
-	qputenv("LINT_ENABLE_COPYRIGHT_AUTHOR_UPDATE", "");
+	qputenv("LINT_ENABLE_COPYRIGHT_UPDATE", "");
 	const RunConfig runConfig2(args);
 	QVERIFY(!runConfig2.options().testFlag(RunOption::ReadOnlyMode));
 }
