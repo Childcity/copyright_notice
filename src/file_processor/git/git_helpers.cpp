@@ -73,15 +73,18 @@ void parseBlameLine(const QByteArray &line, std::vector<GitBlameLine> &result)
 
 namespace git_helpers {
 
+QByteArray runGitTool(const QStringList &arguments, const QString &workingDir)
+{
+	static const QLatin1String program("git");
+	CN_DEBUG("Running " << program << arguments);
+	return runProgram(program, arguments, workingDir);
+}
+
 std::vector<GitBlameLine> blameFile(const QString &repoRoot, const QString &filePath)
 {
-	// clang-format off
-	static const QLatin1String program("git");
-	const QStringList args = {"blame", "HEAD", "-CC", "-w", "-l", "-f", "-t", "--date=iso", "--", filePath};
-	// clang-format on
-
-	CN_DEBUG("Running " << program << args);
-	const auto tokenizedBlame = runProgram(program, args, repoRoot).split('\n');
+	const QStringList args = {"blame", "HEAD", "-CC",        "-w", "-l",
+	                          "-f",    "-t",   "--date=iso", "--", filePath};
+	const auto tokenizedBlame = runGitTool(args, repoRoot).split('\n');
 
 	std::vector<GitBlameLine> result;
 	result.reserve(tokenizedBlame.size());

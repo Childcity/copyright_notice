@@ -4,7 +4,7 @@
 
 #include <git2.h>
 
-#include "git_helpers.h"
+#include "../git_helpers.h"
 #include "src/logger/log.h"
 
 namespace {
