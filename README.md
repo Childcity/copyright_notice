@@ -61,6 +61,9 @@ $ sudo apt install qt5-default # this tool requires Qt5.
 $ git clone https://github.com/Childcity/copyright_notice.git --recurse-submodules
 $ cd copyright_notice
 $ mkdir build- && cd build-
-$ cmake -DCMAKE_BUILD_TYPE:STRING=Release ..
+# To build with LibGit2 as git archive
+  $ cmake -DUSE_LIBGIT2 -DCMAKE_BUILD_TYPE:STRING=Release ..
+# Or to build without LibGit2 as git archive
+  $ cmake -DCMAKE_BUILD_TYPE:STRING=Release ..
 $ cmake --build . --config Release -- -j
 ```
