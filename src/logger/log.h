@@ -28,11 +28,12 @@ enum MsgCode {
 	, GitError                   = 100
 
 	, ProcessingFile             = 500
-	, HeaderFound                = 501
-	, HeaderNotFound             = 502
-	, PossibleAuthors            = 503
-	, WouldUpdateCopyrightNotice = 504
-	, UpdatedCopyrightNotice     = 505
+	, FileOutsideOfRepository    = 501
+	, HeaderFound                = 502
+	, HeaderNotFound             = 503
+	, PossibleAuthors            = 504
+	, WouldUpdateCopyrightNotice = 505
+	, UpdatedCopyrightNotice     = 506
 };
 // clang-format on
 

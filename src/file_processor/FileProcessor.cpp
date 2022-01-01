@@ -51,7 +51,7 @@ bool isPathExcluded(const QString &path, const ExcludedPathSections &excluded)
 void processFile(Context ctx)
 {
 	try {
-		GitRepository repo(ctx.targetPath);
+		GitRepository repo(ctx.targetRepoRootPath);
 		repo.open();
 
 		CN_INF(Msg::ProcessingFile, "Processing file " << ctx.targetPath << '.');
@@ -125,16 +125,32 @@ void FileProcessor::process()
 
 void FileProcessor::process(const QString &targetPath)
 {
+	QString gitRepoRoot;
+
+	try {
+		gitRepoRoot = GitRepository::getWorkingTreeDir(targetPath);
+	} catch (const std::exception &ex) {
+		CN_ERR(Msg::BadTargetPaths,
+		       "Cannot process file or dir " << targetPath << " : " << ex.what() << '.');
+		return;
+	}
+
 	const QFileInfo target(targetPath);
 	const auto &staticConfig = getStaticConfig(m_config);
 
 	if (target.isFile()) {
+		if (!targetPath.contains(gitRepoRoot)) {
+			CN_WARN(Msg::FileOutsideOfRepository,
+			        "Skip file " << targetPath << "that is outside of repo " << gitRepoRoot);
+			return;
+		}
+
 		if (isPathExcluded(targetPath, staticConfig.excludedPathSections())) {
 			CN_DEBUG("Skip excluded file" << targetPath);
 			return;
 		}
 
-		processFile({targetPath, m_config});
+		processFile({targetPath, std::move(gitRepoRoot), m_config});
 		return;
 	}
 
@@ -146,12 +162,20 @@ void FileProcessor::process(const QString &targetPath)
 	while (it.hasNext()) {
 		auto filePath = it.next();
 
+		if (!filePath.contains(gitRepoRoot)) {
+			CN_WARN(Msg::FileOutsideOfRepository,
+			        "Skip file or dir " << filePath << " that is outside of repo " << gitRepoRoot);
+			continue;
+		}
+
 		if (isPathExcluded(filePath, staticConfig.excludedPathSections())) {
 			CN_DEBUG("Skip excluded file or dir" << filePath);
 			continue;
 		}
 
-		gThreadPool.start([this, filePath] { processFile({filePath, m_config}); });
+		gThreadPool.start([this, filePath, gitRepoRoot]() mutable {
+			processFile({std::move(filePath), std::move(gitRepoRoot), m_config});
+		});
 	}
 
 	std::lock_guard l(gThreadPoolMutex);

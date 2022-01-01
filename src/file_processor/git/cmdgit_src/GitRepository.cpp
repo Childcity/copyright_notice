@@ -54,17 +54,12 @@ GitRepository::GitRepository(GitRepository &&other) noexcept = default;
 
 void GitRepository::open()
 {
-	const auto fileDir = QFileInfo(m_path).absolutePath();
-	m_workingTreeDir = hlp::runGitTool({"rev-parse", "--show-toplevel"}, fileDir).trimmed();
-
-	if (!m_path.contains(m_workingTreeDir)) {
-		raiseException(1, "opening repository");
-	}
+	// Do nothing.
 }
 
 QString GitRepository::getWorkingTreeDir() const
 {
-	return m_workingTreeDir;
+	return m_path;
 }
 
 std::vector<QString> GitRepository::getBrokenCommits() const
@@ -88,4 +83,16 @@ std::vector<QString> GitRepository::getBrokenCommits() const
 std::vector<GitBlameLine> GitRepository::blameFile(const QString &filePath) const
 {
 	return git_helpers::blameFile(getWorkingTreeDir(), filePath);
+}
+
+QString GitRepository::getWorkingTreeDir(const QString &filePath)
+{
+	const auto fileDir = QFileInfo(filePath).absolutePath();
+	auto workingTreeDir = hlp::runGitTool({"rev-parse", "--show-toplevel"}, fileDir).trimmed();
+
+	if (!filePath.contains(workingTreeDir)) {
+		raiseException(1, "getting working tree directory");
+	}
+
+	return workingTreeDir;
 }

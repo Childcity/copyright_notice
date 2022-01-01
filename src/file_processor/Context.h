@@ -5,5 +5,6 @@
 struct Context
 {
 	QString targetPath;
+	QString targetRepoRootPath;
 	RunConfig config;
 };

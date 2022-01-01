@@ -15,7 +15,8 @@ struct GitRepository
 	[[nodiscard]] std::vector<QString> getBrokenCommits() const;
 	[[nodiscard]] std::vector<struct GitBlameLine> blameFile(const QString &filePath) const;
 
+	[[nodiscard]] static QString getWorkingTreeDir(const QString &filePath);
+
 private:
 	QString m_path;
-	QString m_workingTreeDir;
 };

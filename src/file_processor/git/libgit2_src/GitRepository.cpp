@@ -114,3 +114,10 @@ std::vector<GitBlameLine> GitRepository::blameFile(const QString &filePath) cons
 {
 	return git_helpers::blameFile(getWorkingTreeDir(), filePath);
 }
+
+QString GitRepository::getWorkingTreeDir(const QString &filePath)
+{
+	GitRepository repo(filePath);
+	repo.open();
+	return repo.getWorkingTreeDir();
+}
