@@ -20,7 +20,9 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 void logger::environment::setPattern()
 {
 	// If a user set QT_MESSAGE_PATTERN globally for system,
-	// expected by 'linter util' message pattern will be changed
+	// expected by 'linter util' message pattern will be changed.
+	// That is why we need to set QT_MESSAGE_PATTERN explicitly by setting
+	// environment variable for this application.
 	qputenv("QT_MESSAGE_PATTERN",
 	        "%{time}"
 	        // " %{file}:%{line}"

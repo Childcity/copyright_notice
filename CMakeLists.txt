@@ -79,15 +79,13 @@ target_link_libraries(${target_name} PRIVATE
 )
 
 set_target_properties(${target_name} PROPERTIES
-                      MACOSX_BUNDLE_GUI_IDENTIFIER copyright_notice.corsair.com
+                      MACOSX_BUNDLE_GUI_IDENTIFIER copyright_notice.com
                       MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
                       MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 )
 
-#add_subdirectory(tests)
-
 # Tests
-set(tst_target_name tst_${PROJECT_NAME})
+set(tst_target_name test_${PROJECT_NAME})
 enable_testing(true)
 set(tst_sources
     tests/tst_RunConfigTest.cpp
