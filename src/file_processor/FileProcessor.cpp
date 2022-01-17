@@ -102,17 +102,6 @@ void processFile(Context ctx)
 
 void FileProcessor::process()
 {
-	try {
-		GitRepository repo(m_config.targetPaths().first());
-		repo.open();
-
-		CN_DEBUG("Using repository" << repo.getWorkingTreeDir());
-	} catch (const std::exception &ex) {
-		CN_ERR(Msg::InternalError,
-		       "Cannot process file " << m_config.targetPaths().first() << ": " << ex.what());
-		return;
-	}
-
 	for (const auto &path : m_config.targetPaths()) {
 		if (!QFileInfo::exists(path)) {
 			CN_WARN(Msg::FileOrDirIsNotExist, "Skip not existed target " << path);
@@ -129,6 +118,7 @@ void FileProcessor::process(const QString &targetPath)
 
 	try {
 		gitRepoRoot = GitRepository::getWorkingTreeDir(targetPath);
+		CN_DEBUG("Using repository" << gitRepoRoot);
 	} catch (const std::exception &ex) {
 		CN_ERR(Msg::BadTargetPaths,
 		       "Cannot process file or dir " << targetPath << " : " << ex.what() << '.');
