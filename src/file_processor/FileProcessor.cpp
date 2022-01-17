@@ -61,8 +61,12 @@ void processFile(Context ctx)
 		header.load();
 
 		if (!header.isEmpty()) {
-			header.parse();
-			CN_DEBUG("Header found in " << ctx.targetPath << '.');
+			try {
+				header.parse();
+				CN_DEBUG("Header found in " << ctx.targetPath << '.');
+			} catch (const std::exception &) {
+				CN_DEBUG("Header not found or incorrect format met in  " << ctx.targetPath << '.');
+			}
 		} else {
 			CN_DEBUG("Header not found in " << ctx.targetPath << '.');
 		}

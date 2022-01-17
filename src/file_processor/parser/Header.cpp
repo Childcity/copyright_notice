@@ -205,7 +205,7 @@ void Header::parseField(std::string_view rawField)
 	const auto match = m_regex.match(qRawField);
 
 	if (!match.hasMatch()) {
-		CN_ERR(Msg::BadHeaderFormat, "Error matching header.");
+		CN_ERR(Msg::BadHeaderFormat, "Error matching header for " << m_ctx.targetPath << '.');
 		throw std::exception();
 	}
 
