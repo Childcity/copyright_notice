@@ -32,8 +32,9 @@ QByteArray runProgram(const QString &program, const QStringList &arguments,
 			errorText = p.readAllStandardOutput().trimmed();
 		}
 		CN_ERR(Msg::RunningExternalToolError,
-		       "Failed to run program [" << p.exitCode() << "]:" << program << " " << arguments
-		                                 << ". Error: " << errorText);
+		       "Failed to run program [exitCode = " << p.exitCode() << ", isTimeout = " << isTimeout
+		                                            << "]: " << program << " " << arguments
+		                                            << ". Error: " << errorText.simplified());
 		throw std::exception();
 	}
 
