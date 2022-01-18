@@ -40,10 +40,11 @@ QCommandLineOption updateFileName{"update-filename", "Add or fix 'File' field."}
 QCommandLineOption updateAuthors{"update-authors", "Add or update author list."};
 QCommandLineOption updateAuthorsOnlyIfEmpty{
     "update-authors-only-if-empty",
-	"Update author list only if this list is empty in author field (edited by someone else)."};
+    "Update author list only if this list is empty in author field (edited by someone else)."};
 QCommandLineOption maxBlameAuthors{
     "max-blame-authors-to-start-update",
-	"Update author list only if blame authors <= some limit.", "number", "0"};
+    "Update author list only if blame authors <= some limit. "
+    "Should be a positive number (0 or -1 mean 'unlimited' and used by default).", "number", "0"};
 
 QCommandLineOption dontSkipBrokenMerges{
     "dont-skip-broken-merges", "Do not skip broken merge commits."};
@@ -122,7 +123,7 @@ RunConfig::RunConfig(const QStringList &arguments) noexcept
 			CN_ERR(Msg::BadMaxBlameAuthors,
 			       ::maxBlameAuthors.names().first() << " should be a positive number (0 or -1 "
 			                                            "mean 'unlimited' and used by default).");
-			std::exit(apperror::RunArgError);
+			parser.showHelp(apperror::RunArgError);
 		}
 
 		constexpr auto maxInt = std::numeric_limits<int>::max();
@@ -138,7 +139,7 @@ RunConfig::RunConfig(const QStringList &arguments) noexcept
 		if (m_staticConfigPath.isEmpty()) {
 			CN_ERR(Msg::BadStaticConfigPaths,
 			       ::staticConfigPath.names().first() << " should not be empty string.");
-			std::exit(apperror::RunArgError);
+			parser.showHelp(apperror::RunArgError);
 		}
 	} else {
 		QDir appDir(qApp->applicationDirPath());
@@ -158,7 +159,7 @@ RunConfig::RunConfig(const QStringList &arguments) noexcept
 	m_targetPaths = parser.positionalArguments();
 	if (m_targetPaths.isEmpty() || m_targetPaths.first().isEmpty()) {
 		CN_ERR(Msg::BadTargetPaths, "'file_or_dir' should not be empty string.");
-		std::exit(apperror::RunArgError);
+		parser.showHelp(apperror::RunArgError);
 	}
 
 	std::transform(m_targetPaths.cbegin(), m_targetPaths.cend(), m_targetPaths.begin(),
