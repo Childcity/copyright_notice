@@ -69,10 +69,18 @@ void Header::load()
 void Header::parse()
 {
 	const auto body = header_helpers::findHeaderBody(m_rawHeader, m_prefix, m_suffix);
-	if (!body.empty()) {
+	if (body.empty()) {
+		return;
+	}
+
+	try {
 		const auto tokenizedBody = header_helpers::splitString(body, "\n");
 		std::for_each(tokenizedBody.cbegin(), tokenizedBody.cend(),
 		              [this](auto &&arg) { parseField(std::forward<decltype(arg)>(arg)); });
+	} catch (const std::exception &) {
+		m_headerRangeOpt = std::nullopt;
+		m_rawHeader = {};
+		throw;
 	}
 }
 
@@ -201,6 +209,10 @@ void Header::initRegex()
 
 void Header::parseField(std::string_view rawField)
 {
+	if (rawField.empty() || rawField == m_start) {
+		return;
+	}
+
 	const auto qRawField = QString::fromUtf8(rawField.data(), static_cast<int>(rawField.size()));
 	const auto match = m_regex.match(qRawField);
 
