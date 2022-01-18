@@ -15,7 +15,9 @@ struct FileProcessor
 
 	void process();
 	void process(const QString &targetPath);
+	[[nodiscard]] bool isAnyFileUpdated();
 
 private:
 	const RunConfig &m_config;
+	std::atomic_flag m_isAnyFileUpdated = ATOMIC_FLAG_INIT;
 };

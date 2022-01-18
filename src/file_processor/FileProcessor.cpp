@@ -48,7 +48,7 @@ bool isPathExcluded(const QString &path, const ExcludedPathSections &excluded)
 	    || isExtensionExcluded(path);
 }
 
-void processFile(Context ctx)
+bool processFile(Context ctx)
 {
 	try {
 		GitRepository repo(ctx.targetRepoRootPath);
@@ -73,7 +73,7 @@ void processFile(Context ctx)
 
 		if (!header.fix()) {
 			CN_DEBUG("Header in file" << ctx.targetPath << "will not be updated.");
-			return;
+			return false;
 		}
 
 		CN_DEBUG("Header in file" << ctx.targetPath << "needs to be updated.");
@@ -86,7 +86,7 @@ void processFile(Context ctx)
 					"Would update Copyright Notice in file " << ctx.targetPath
 					<< " with the following:\n" << headerData);
 			// clang-format on
-			return;
+			return false;
 		}
 
 		const auto contentData = header.contentWithoutHeader();
@@ -98,8 +98,10 @@ void processFile(Context ctx)
 	} catch (const std::exception &ex) {
 		CN_ERR(Msg::InternalError,
 		       "Cannot process file " << ctx.targetPath << ": " << ex.what() << '.');
-		return;
+		return false;
 	}
+
+	return true;
 }
 
 }  // namespace
@@ -168,10 +170,17 @@ void FileProcessor::process(const QString &targetPath)
 		}
 
 		gThreadPool.start([this, filePath, gitRepoRoot]() mutable {
-			processFile({std::move(filePath), std::move(gitRepoRoot), m_config});
+			if (processFile({std::move(filePath), std::move(gitRepoRoot), m_config})) {
+				m_isAnyFileUpdated.test_and_set(std::memory_order_relaxed);
+			}
 		});
 	}
 
 	std::lock_guard l(gThreadPoolMutex);
 	gThreadPool.waitForDone();
+}
+
+bool FileProcessor::isAnyFileUpdated()
+{
+	return m_isAnyFileUpdated.test();
 }

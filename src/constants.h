@@ -25,11 +25,12 @@ namespace apperror {
 
 // clang-format off
 enum ExitCode {
-	Success         = 0
+	Success         = 0 // None of the files have changed
 	, RunArgError   = 1
 	, GitError      = 2
 	, ParseError    = 3
 	, InternalError = 4
+	, FilesChanged  = 10
 };
 // clang-format on
 

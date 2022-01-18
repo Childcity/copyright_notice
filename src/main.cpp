@@ -1,8 +1,8 @@
 #include <QCoreApplication>
 
-#include "src/logger/log.h"
 #include "configuration/RunConfig.h"
 #include "file_processor/FileProcessor.h"
+#include "src/logger/log.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,7 +16,8 @@ int main(int argc, char *argv[])
 	const RunConfig runConfig(QCoreApplication::arguments());
 	logger::init(runConfig.options() & RunOption::Verbose);
 
-	FileProcessor(runConfig).process();
+	FileProcessor fileProcessor(runConfig);
+	fileProcessor.process();
 
-	return apperror::Success;
+	return fileProcessor.isAnyFileUpdated() ? apperror::FilesChanged : apperror::Success;
 }
