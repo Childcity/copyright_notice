@@ -14,22 +14,8 @@ using StringViewIterator = std::string_view::iterator;
 using HeaderRange = std::pair<StringViewIterator, StringViewIterator>;
 using HeaderRangeOpt = std::optional<std::pair<StringViewIterator, StringViewIterator>>;
 
-constexpr HeaderRangeOpt headerRange(std::string_view content, std::string_view prefix,
-                                     std::string_view suffix)
-{
-	const auto stItr = std::search(content.begin(), content.end(), prefix.begin(), prefix.end());
-	if (stItr == content.end()) {
-		return std::nullopt;
-	}
-
-	auto endItr = std::search(content.begin(), content.end(), suffix.begin(), suffix.end());
-	if (endItr == content.end()) {
-		return std::nullopt;
-	}
-
-	std::advance(endItr, suffix.size());
-	return std::pair{stItr, endItr};
-}
+HeaderRangeOpt headerRange(std::string_view content, std::string_view prefix,
+                           std::string_view suffix);
 
 constexpr std::string_view getHeader(std::string_view content, const auto &headerRange)
 {
@@ -55,7 +41,7 @@ constexpr std::string_view findHeaderBody(std::string_view header, std::string_v
 	std::advance(stBodyIt, prefix.size());
 
 	auto endBodyIt = header.end();
-	std::advance(endBodyIt, -suffix.size());
+	std::advance(endBodyIt, -static_cast<std::intmax_t>(suffix.size()));
 
 	auto bodySize = std::distance(stBodyIt, endBodyIt);
 	bodySize = std::max(bodySize, 0ll);

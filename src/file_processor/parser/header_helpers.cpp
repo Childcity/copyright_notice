@@ -16,6 +16,23 @@ std::once_flag create;
 
 namespace header_helpers {
 
+HeaderRangeOpt headerRange(std::string_view content, std::string_view prefix,
+                           std::string_view suffix)
+{
+	const auto stItr = std::search(content.begin(), content.end(), prefix.begin(), prefix.end());
+	if (stItr == content.end()) {
+		return std::nullopt;
+	}
+
+	auto endItr = std::search(content.begin(), content.end(), suffix.begin(), suffix.end());
+	if (endItr == content.end()) {
+		return std::nullopt;
+	}
+
+	std::advance(endItr, suffix.size());
+	return std::pair{stItr, endItr};
+}
+
 std::vector<std::string_view> splitString(std::string_view str, std::string_view delimiter)
 {
 	std::vector<std::string_view> strings;
